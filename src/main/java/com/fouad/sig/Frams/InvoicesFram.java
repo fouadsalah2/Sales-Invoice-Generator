@@ -4,16 +4,15 @@
  */
 package com.fouad.sig.Frams;
 
+import com.fouad.sig.model.FileOperations;
 import com.fouad.sig.model.InvoiceTableModel;
 import com.fouad.sig.model.ItemTableModel;
 import com.fouad.sig.model.SalesInvoice;
 import com.fouad.sig.model.SalesInvoiceLine;
 import com.fouad.sig.util.Extentions;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -32,12 +31,14 @@ import javax.swing.event.ListSelectionListener;
  */
 public class InvoicesFram extends javax.swing.JFrame {
 
+    FileOperations _fileOperation;
+
     /**
      * Creates new form InvoicesFram
      */
     public InvoicesFram() {
         initComponents();
-
+        _fileOperation = new FileOperations(this);
     }
 
     /**
@@ -73,6 +74,7 @@ public class InvoicesFram extends javax.swing.JFrame {
         saveMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("asdfasdf");
         setBackground(new java.awt.Color(255, 255, 255));
 
         tableInvoices.setModel(new javax.swing.table.DefaultTableModel(
@@ -343,84 +345,29 @@ public class InvoicesFram extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
-        var invLines = ReadCSVFile("Invoice_Header.csv");
-        var invLineItems = ReadCSVFile("Invoice_Line.csv");
-
-        var invoices = SalesInvoice.FromLines(invLines, invLineItems);
-        if (invoices == null) {
-            return;
+        try {
+            _invoices = _fileOperation.ReadFile();
+            ClearInvoice();
+            ShowInvoices();
+        } catch (Exception t) {
+            JOptionPane.showMessageDialog(this,t.getMessage(), "Error" , JOptionPane.ERROR_MESSAGE);
         }
-
-        _invoices = invoices;
-        ClearInvoice();
-        ShowInvoices();
-
     }//GEN-LAST:event_openMenuItemActionPerformed
 
     private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuItemActionPerformed
-        InvoicesFram.WriteToCSV(_invoices);
-        InvoicesFram.WriteLinesToCSV(_invoices);
-
+        
+        try {
+         _fileOperation.SaveFile(_invoices);
+          JOptionPane.showMessageDialog(this,"Files saving completed sucessfully", "Information",  JOptionPane.INFORMATION_MESSAGE);
+        
+        } catch (Exception t) {
+            JOptionPane.showMessageDialog(this,t.getMessage(), "Error" , JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_saveMenuItemActionPerformed
 
-    private static void WriteToCSV(List<SalesInvoice> invoices) {
-        //Invoice_Line.csv
-        //Invoice_Header.csv
-        try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Invoice_Header.csv"), "UTF-8"));
-            for (SalesInvoice inv : invoices) {
-                bw.write(inv.ToCSVLine());
-                bw.newLine();
-            }
-            bw.flush();
-            bw.close();
-        } catch (UnsupportedEncodingException e) {
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
-        }
-    }
+   
 
-    private static void WriteLinesToCSV(List<SalesInvoice> invoices) {
-
-        ArrayList<String> lines = new ArrayList<>();
-        for (SalesInvoice inv : invoices) {
-            var invLines = inv.getItemLines();
-            for (SalesInvoiceLine line : invLines) {
-                lines.add(line.ToCSVLine(inv.getNo()));
-            }
-        }
-
-        try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("Invoice_Line.csv"), "UTF-8"));
-            for (String line : lines) {
-                bw.write(line);
-                bw.newLine();
-            }
-            bw.flush();
-            bw.close();
-        } catch (UnsupportedEncodingException e) {
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
-        }
-    }
-
-    private static List<String> ReadCSVFile(String fileName) {
-
-        try ( BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            List<String> lines = new ArrayList<>();
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-            return lines;
-
-        } catch (UnsupportedEncodingException e) {
-        } catch (FileNotFoundException e) {
-        } catch (IOException e) {
-        }
-        return null;
-    }
+    
 
     private void ShowInvoices() {
 

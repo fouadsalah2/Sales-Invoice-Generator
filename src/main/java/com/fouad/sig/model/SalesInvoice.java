@@ -80,6 +80,11 @@ public class SalesInvoice {
                 .filter(x -> x.getItemTotal()
                 .compareTo(BigDecimal.ZERO) != 0)
                 .toList();
+        
+        for(int i=0; i< newLines.size(); i++)
+        {
+            newLines.get(i).setNo(i+1);
+        }
 
         itemLines.clear();
         itemLines.addAll(newLines);
@@ -153,21 +158,32 @@ public class SalesInvoice {
         return invLines;
     }
 
-    public static SalesInvoice FromLine(String[] line) {
+    public static SalesInvoice FromLine(String[] line) throws Exception {
         var inv = new SalesInvoice();
 
+        if (line.length != 3) {
+            throw new Exception("Invalid invoice line format");
+        }
+        
         if (line[0].isEmpty() || line[0].isBlank()) {
             return null;
         }
+        
 
         inv.setNo(Integer.parseInt(line[0]));
+
+        var date = Extentions.ParseDate(line[1]);
+        if (date == null) {
+            throw new Exception("Invalide date format. date should be (DD/MM/YYYY)");
+        }
+
         inv.setDate(Extentions.ParseDate(line[1]));
         inv.setCustomer(line[2]);
 
         return inv;
     }
 
-    public static List<SalesInvoice> FromLines(List<String> invLines, List<String> itemLines) {
+    public static List<SalesInvoice> FromLines(List<String> invLines, List<String> itemLines) throws Exception {
 
         List<SalesInvoiceLine> allLines = new ArrayList<>();
 
@@ -193,5 +209,16 @@ public class SalesInvoice {
         }
 
         return invoices;
+    }
+
+    public void Print() {
+        System.out.println("Invoice: " + getNo());
+        System.out.println("{");
+        System.out.println("[" + Extentions.DateToString(getDate()) + "]" + ", " + getCustomer());
+        for (var line : this.itemLines) {
+            System.out.println(line.toString());
+        }
+        System.out.println("}");
+        System.out.println("");
     }
 }

@@ -14,8 +14,24 @@ import java.time.format.DateTimeFormatter;
 public class Extentions {
 
     public static LocalDate ParseDate(String dateTxt) {
+        var localDate = ParseDate(dateTxt, "d/MM/yyyy");
+        if (localDate == null) {
+            localDate = ParseDate(dateTxt, "d-MM-yyyy");
+        }
+
+        if (localDate == null) {
+            localDate = ParseDate(dateTxt, "dd-MM-yyyy");
+        }
+
+        if (localDate == null) {
+            localDate = ParseDate(dateTxt, "dd/MM/yyyy");
+        }
+        return localDate;
+    }
+
+    private static LocalDate ParseDate(String dateTxt, String pattern) {
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
             //convert String to LocalDate
             LocalDate localDate = LocalDate.parse(dateTxt, formatter);
 

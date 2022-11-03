@@ -4,6 +4,7 @@
  */
 package com.fouad.sig.model;
 
+import com.fouad.sig.util.Extentions;
 import java.math.BigDecimal;
 
 public class SalesInvoiceLine {
@@ -75,28 +76,39 @@ public class SalesInvoiceLine {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append(no).append(',');
+        builder.append(invoiceNo).append(',');
         builder.append(itemName).append(',');
         builder.append(String.format("%.2f", itemPrice)).append(',');
-        builder.append(itemCount).append(',');
-        builder.append(invoiceNo);
-        //builder.append(String.format("%.2f", itemTotal));
+        builder.append(itemCount);
 
         return builder.toString();
     }
 
-    public static SalesInvoiceLine FromLine(String[] line) {
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(itemName).append(',');
+        builder.append(String.format("%.2f", itemPrice)).append(',');
+        builder.append(itemCount);
+
+        return builder.toString();
+    }
+
+    public static SalesInvoiceLine FromLine(String[] line) throws Exception {
         var invItem = new SalesInvoiceLine();
 
+        if (line.length != 4) {
+            throw new Exception("Invalid invoice line format");
+        }
         if (line[0].isEmpty() || line[0].isBlank()) {
-            return null;
+            throw new Exception("Invalid invoice line format");
         }
 
-        invItem.setNo(Integer.parseInt(line[0]));
+        invItem.setInvNo(Integer.parseInt(line[0]));
         invItem.setItemName(line[1]);
         invItem.setItemPrice(new BigDecimal(line[2]));
         invItem.setItemCount(Integer.parseInt(line[3]));
-        invItem.setInvNo(Integer.parseInt(line[4]));
 
         return invItem;
     }
