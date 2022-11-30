@@ -92,7 +92,7 @@ public class InvoicesFram extends javax.swing.JFrame {
 
         jLabel1.setText("Invoices Table");
 
-        btnCancel.setText("Cancel");
+        btnCancel.setText("Delete Item");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
@@ -113,7 +113,7 @@ public class InvoicesFram extends javax.swing.JFrame {
             }
         });
 
-        btnSave.setText("Save");
+        btnSave.setText("Create Item");
         btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveActionPerformed(evt);
